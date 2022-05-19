@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "main": "mult-sign-helper.js",
+  "type": "module",
   "bin": {
     "mult-sign-helper": "./mult-sign-helper.js"
   },
@@ -10,7 +11,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "mult-sign-helper": "node mult-sign-helper "
   },
-  "type": "modules",
   "keywords": [],
   "author": "",
   "license": "ISC",

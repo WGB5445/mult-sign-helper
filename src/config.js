@@ -1,10 +1,6 @@
-const {
-    providers
-} = require('@starcoin/starcoin');
-
-
+import { providers } from '@starcoin/starcoin'
 // networks
-module.exports = {
+export  let Config = {
     networks: {
         development: {
             chainId: 254,

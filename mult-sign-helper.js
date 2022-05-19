@@ -1,12 +1,11 @@
-
-const yargs = require('yargs/yargs')
-const { hideBin } = require('yargs/helpers')
-const { getMultiAccount,signmultisigtxn,signmultisigfile,deploy } = require('./src/mult-utls.js');
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers';
+import { getMultiAccount,signmultisigtxn,signmultisigfile,deploy } from './src/mult-utls.js';
 
 
 const arg = hideBin(process.argv)
-    cli = yargs(arg)
-    cli.usage('mult-sign-helper: [command] <options>')
+yargs(arg)
+    .usage('mult-sign-helper: [command] <options>')
     .strict(false)
     .alias('h', 'help')
     .alias('v',"version")
@@ -81,10 +80,6 @@ const arg = hideBin(process.argv)
         process.exit(0);
         }
     )
-    .default('help')
     .version('version','Starcoin 多签工具','Starcoin 多签工具 v0.0.1')
-    .wrap(cli.terminalWidth())
     .epilogue('')
-    // .showHelp()
     .argv
-    

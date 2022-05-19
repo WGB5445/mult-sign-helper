@@ -1,29 +1,22 @@
-const {
+import { 
     utils,
     encoding,
-    starcoin_types
-} = require('@starcoin/starcoin');
-
-const {
+    starcoin_types 
+} from '@starcoin/starcoin';
+import { 
     hexlify,
     arrayify,
-} = require('@ethersproject/bytes');
-
-require('dotenv').config();
-const Config = require('./config');
-
-const {
-    utils:ed25519Utils,
-} = require('@noble/ed25519');
-
-const {
-    readFileSync,
-    writeFileSync,
-} = require('fs');
-const exp = require('constants');
+} from '@ethersproject/bytes';
+import dotenv from 'dotenv';
+import {Config} from './config.js';
+import * as ed25519Utils from '@noble/ed25519';
+import * as inquirer from 'inquirer';
+import  { readFileSync,writeFileSync } from 'node:fs';
+import  exp from 'constants';
 
 
-const getMultiAccount = async () => {
+dotenv.config()
+export  async function getMultiAccount () {
     const shardAccount = await utils.multiSign.generateMultiEd25519KeyShard(
         process.env.PUBLIC_KEYS.split(','),
         process.env.PRIVATE_KEY.split(','),
@@ -32,9 +25,6 @@ const getMultiAccount = async () => {
     const account = utils.account.showMultiEd25519Account(shardAccount);
     return { shardAccount, sender: account.address }  
 };
-
-exports.getMultiAccount = getMultiAccount
-
 
 const writeTxn = (txn) => {
     const name = Buffer.from(ed25519Utils.randomPrivateKey()).toString('hex').slice(0, 8);
@@ -94,7 +84,7 @@ const mergeMultiTxn = async (shardAccount, rawSignatureShard) => {
     return { enough, txn };
 };
 
-exports.signmultisigtxn = async (argv)=>{
+export  async function signmultisigtxn (argv){
     let functionId = argv.function
     let typeArgs
     if(argv.type_tag.constructor != Array){
@@ -156,8 +146,7 @@ exports.signmultisigtxn = async (argv)=>{
 };
 
 
-const inquirer = require('inquirer');
-const { argv } = require('process');
+
 const askQuestions = async () => {
     const questions = [
         {
@@ -172,7 +161,7 @@ const askQuestions = async () => {
 
 
 
-exports.signmultisigfile = async (argv)=>{
+export  async function  signmultisigfile  (argv) {
     let network = argv.network
     let file = argv.file
     const config = Config.networks[network];
@@ -225,7 +214,7 @@ exports.signmultisigfile = async (argv)=>{
     };
 };
 
-exports.deploy = async (argv)=>{
+export  async function deploy  (argv){
     let network = argv.network
     let file = argv.file
     console.log(file)
@@ -242,7 +231,7 @@ exports.deploy = async (argv)=>{
     const expiredSecs = 43200
     const expirationTimestampSecs = nowSeconds + expiredSecs
     const transactionPayload = encoding.packageHexToTransactionPayload(hex)
-    
+
     const rawUserTransaction = utils.tx.generateRawUserTransaction(
         sender,
         transactionPayload,
@@ -256,8 +245,8 @@ exports.deploy = async (argv)=>{
     const signatureShard = await utils.multiSign.generateMultiEd25519SignatureShard(shardAccount, rawUserTransaction)
     const authenticator = new starcoin_types.TransactionAuthenticatorVariantMultiEd25519(shardAccount.publicKey(), signatureShard.signature)
     const partial_signed_txn = new starcoin_types.SignedUserTransaction(rawUserTransaction, authenticator)
-    // console.log({ partial_signed_txn })
-    // console.log(partial_signed_txn.authenticator)
+
+    
     const filename = (function () {
         const privateKeyBytes = ed25519Utils.randomPrivateKey();
         const name = Buffer.from(privateKeyBytes).toString('hex').slice(0, 8);
