@@ -32,5 +32,5 @@ Multi-sign transaction
 yarn mult-sign-helper sign-multisig-txn -f 0x1::TransferScripts::peer_to_peer_v2 -t 0x1::STC::STC -a 0x01 -a 100 -n barnard
 ```
 ```
-yarn mult-sign-helper sign-multisig-file /path/to/file.txn
+yarn mult-sign-helper sign-multisig-file -f /path/to/file.txn -n barnard
 ```
