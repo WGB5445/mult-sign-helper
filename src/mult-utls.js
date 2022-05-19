@@ -86,9 +86,6 @@ const mergeMultiTxn = async (shardAccount, rawSignatureShard) => {
     // new
     const signatureShard = await utils.multiSign.generateMultiEd25519SignatureShard(shardAccount, rawTransaction);
     const newSignatureShards = new starcoin_types.MultiEd25519SignatureShard(signatureShard.signature, threshold);
-    console.log("********************")
-    console.log([signatureShard.signature,threshold,rawSignatureShards, newSignatureShards])
-    console.log("********************")
     // merge
     const mergedSignatureShards = starcoin_types.MultiEd25519SignatureShard.merge([rawSignatureShards, newSignatureShards]);
 
@@ -160,6 +157,7 @@ exports.signmultisigtxn = async (argv)=>{
 
 
 const inquirer = require('inquirer');
+const { argv } = require('process');
 const askQuestions = async () => {
     const questions = [
         {
@@ -175,19 +173,16 @@ const askQuestions = async () => {
 
 
 exports.signmultisigfile = async (argv)=>{
-
-
     let network = argv.network
     let file = argv.file
-    console.log(file)
     const config = Config.networks[network];
-    
     const provider = config.provider();
 
     const balanceOf = async (address, tokenType='0x1::STC::STC') => {
         let balance = await provider.getBalance(address, tokenType);
         return balance / (10 ** 9);
     };
+
     const timed = `✅ Transaction Multi ${file}`;
     console.time(timed);
 
@@ -228,4 +223,51 @@ exports.signmultisigfile = async (argv)=>{
     if (network == "development") {
         provider.destroy();
     };
+};
+
+exports.deploy = async (argv)=>{
+    let network = argv.network
+    let file = argv.file
+    console.log(file)
+    const config = Config.networks[network];
+    const provider = config.provider();
+    const { shardAccount, sender } = await getMultiAccount();
+    const hex = readHexFromFile(file);
+    const senderSequenceNumber = await provider.getSequenceNumber(
+        sender
+    ) || 0;
+    const maxGasAmount = 40000000n;
+    const gasUnitPrice = 10;
+    const nowSeconds = await provider.getNowSeconds();
+    const expiredSecs = 43200
+    const expirationTimestampSecs = nowSeconds + expiredSecs
+    const transactionPayload = encoding.packageHexToTransactionPayload(hex)
+    
+    const rawUserTransaction = utils.tx.generateRawUserTransaction(
+        sender,
+        transactionPayload,
+        maxGasAmount,
+        gasUnitPrice,
+        senderSequenceNumber,
+        expirationTimestampSecs,
+        config.chainId
+    );
+   
+    const signatureShard = await utils.multiSign.generateMultiEd25519SignatureShard(shardAccount, rawUserTransaction)
+    const authenticator = new starcoin_types.TransactionAuthenticatorVariantMultiEd25519(shardAccount.publicKey(), signatureShard.signature)
+    const partial_signed_txn = new starcoin_types.SignedUserTransaction(rawUserTransaction, authenticator)
+    // console.log({ partial_signed_txn })
+    // console.log(partial_signed_txn.authenticator)
+    const filename = (function () {
+        const privateKeyBytes = ed25519Utils.randomPrivateKey();
+        const name = Buffer.from(privateKeyBytes).toString('hex').slice(0, 8);
+        return `${ name }.multisig-txn`
+    })();
+    try {
+        const partial_signed_txn_hex =encoding.bcsEncode(partial_signed_txn);
+        writeFileSync(filename, arrayify(partial_signed_txn_hex));
+        console.log(`✅ 成功生成签名文件: ${filename}`);
+    } catch (error) {
+        console.log(error);
+    }
 };

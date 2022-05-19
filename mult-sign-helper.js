@@ -1,7 +1,7 @@
-#!/usr/bin/env node
+
 const yargs = require('yargs/yargs')
 const { hideBin } = require('yargs/helpers')
-const { getMultiAccount,signmultisigtxn,signmultisigfile } = require('./src/mult-utls.js');
+const { getMultiAccount,signmultisigtxn,signmultisigfile,deploy } = require('./src/mult-utls.js');
 
 
 const arg = hideBin(process.argv)
@@ -25,21 +25,49 @@ const arg = hideBin(process.argv)
                 type:'string',
                 alias:'a',
                 describe: '需要传入的函数参数'
+            }),
+            yargs.option('network',{
+                type:'string',
+                alias: 'n',
+                describe: '指定网络'
             })
         },async (argv) =>{
             await signmultisigtxn(argv)
             process.exit(0);
-    })
+        }
+    )
     .command('sign-multisig-file', '对多签交易文件进行签名',(yargs)=> {
             yargs.option( "file", {
                 type:'string',
                 alias: 'f',
                 describe: '需要签名的文件'
+            }),
+            yargs.option('network',{
+                type:'string',
+                alias: 'n',
+                describe: '指定网络'
             })
         },async (argv) =>{
             await signmultisigfile(argv)
             process.exit(0);
-    })
+        }
+    )
+    .command('deploy','使用多签部署二进制 blob 合约  ' ,(yargs)=>{
+        yargs.option("file",{
+            type:'string',
+            alias:'f',
+            describe:'需要部署的 blob '
+        }),
+        yargs.option('network',{
+            type:'string',
+            alias: 'n',
+            describe: '指定网络'
+        })
+        },async  (argv) =>{
+            await deploy(argv)
+            process.exit(0);
+        }
+    )
     .command('get-address','根据 .env 文件生成对应的多签地址',(yargs)=>{
             
     },async (argv) =>  {
@@ -49,14 +77,10 @@ const arg = hideBin(process.argv)
         }catch(e){
             console.log(`❌ 出现错误：请检查 私钥 和 公钥 的配置 ${e}`);
         }
+
         process.exit(0);
-        
-    })
-    .option('network',{
-        type:'string',
-        alias: 'n',
-        describe: '指定网络'
-    })
+        }
+    )
     .default('help')
     .version('version','Starcoin 多签工具','Starcoin 多签工具 v0.0.1')
     .wrap(cli.terminalWidth())

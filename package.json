@@ -3,17 +3,22 @@
   "version": "0.0.1",
   "description": "",
   "main": "mult-sign-helper.js",
-  "bin" : { "mult-sign-helper" : "./mult-sign-helper.js" },
+  "bin": {
+    "mult-sign-helper": "./mult-sign-helper.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "mult-sign-helper":"node mult-sign-helper "
+    "mult-sign-helper": "node mult-sign-helper "
   },
+  "type": "modules",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@starcoin/starcoin": "^2.1.4",
+    "chalk": "^5.0.1",
     "dotenv": "^10.0.0",
+    "figlet": "^1.5.2",
     "inquirer": "^8.2.4",
     "yargs": "^17.5.1",
     "yargs-parser": "^21.0.1"
