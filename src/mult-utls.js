@@ -83,7 +83,38 @@ const mergeMultiTxn = async (shardAccount, rawSignatureShard) => {
     const txn = signMultiTxn(shardAccount, mergedSignatureShards, rawTransaction);
     return { enough, txn };
 };
+export function checkarg (argv){
+    const commands = new Map([
+        ['sign-multisig-txn',true],
+        ['sign-multisig-file',true],
+        ['deploy',true],
+    ]);
+    const file_cmds = new Map([
+        ['sign-multisig-file',true],
+        ['deploy',true],
+    ]);
+    if( argv._.length >= 1 || commands.get(argv._.at(0)) ){
+        if(file_cmds.get(argv._.at(0))){
+            if(! argv.file ){
+                throw "参数错误:请输入 file 参数"
+            }
+        }else if(argv._.at(0) == 'sign-multisig-txn'){
+            if(! argv.function){
+                throw "参数错误:请输入 function 参数"
+            }
+        }
+        if( argv.network == 'local'){
+            if(! argv.id){
+                throw "参数错误:请输入 id 参数,指定本地网络的 chainid"
+            }
+            if(! argv.url){
+                throw "参数错误:请输入 url 参数,指定本地网络的连接方式"
+            }
+        }
 
+    }
+    
+}
 export  async function signmultisigtxn (argv){
     let functionId = argv.function
     let typeArgs
@@ -101,10 +132,16 @@ export  async function signmultisigtxn (argv){
 
     let network = argv.network
 
-    const config = Config.networks[network];
-    
-    const provider = config.provider();
-    
+    let provider ;
+    let  config 
+    if( argv.network == 'local'){
+        provider = new providers.WebsocketProvider( argv.url );
+        config = Config.networks['development'];
+    }else{
+        config = Config.networks[network];
+        provider = config.provider();
+    }
+
     const { shardAccount, sender } = await getMultiAccount();
     let scriptFunction = await utils.tx.encodeScriptFunctionByResolve(functionId, typeArgs, args, config.url);
     const senderSequenceNumber = await provider.getSequenceNumber(
@@ -164,8 +201,16 @@ const askQuestions = async () => {
 export  async function  signmultisigfile  (argv) {
     let network = argv.network
     let file = argv.file
-    const config = Config.networks[network];
-    const provider = config.provider();
+    let provider ;
+    let  config 
+    if( argv.network == 'local'){
+        provider = new providers.WebsocketProvider( argv.url );
+        config = Config.networks['development'];
+    }else{
+        config = Config.networks[network];
+        provider = config.provider();
+    }
+    
 
     const balanceOf = async (address, tokenType='0x1::STC::STC') => {
         let balance = await provider.getBalance(address, tokenType);
@@ -215,11 +260,19 @@ export  async function  signmultisigfile  (argv) {
 };
 
 export  async function deploy  (argv){
+    
     let network = argv.network
     let file = argv.file
-    console.log(file)
-    const config = Config.networks[network];
-    const provider = config.provider();
+    let provider ;
+    let  config 
+    if( argv.network == 'local'){
+        provider = new providers.WebsocketProvider( argv.url );
+        config = Config.networks['development'];
+    }else{
+        config = Config.networks[network];
+        provider = config.provider();
+    }
+
     const { shardAccount, sender } = await getMultiAccount();
     const hex = readHexFromFile(file);
     const senderSequenceNumber = await provider.getSequenceNumber(

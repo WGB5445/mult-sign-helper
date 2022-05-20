@@ -1,12 +1,27 @@
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers';
-import { getMultiAccount,signmultisigtxn,signmultisigfile,deploy } from './src/mult-utls.js';
-
+import { getMultiAccount,signmultisigtxn,signmultisigfile,deploy,checkarg } from './src/mult-utls.js';
+import chalk  from "chalk";
+import figlet  from "figlet";
+function init ()  {
+    
+    console.log(
+      chalk.green(
+        figlet.textSync("STC mult helper", {
+          font: "Standard",
+          horizontalLayout: "universal smushing",
+          verticalLayout: "universal smushing",
+          width:80
+        })
+      )
+    );
+  };
+init()
 
 const arg = hideBin(process.argv)
 yargs(arg)
     .usage('mult-sign-helper: [command] <options>')
-    .strict(false)
+    .strict(true)
     .alias('h', 'help')
     .alias('v',"version")
     .command('sign-multisig-txn', '执行交易并生成签名文件',(yargs)=> {
@@ -28,10 +43,30 @@ yargs(arg)
             yargs.option('network',{
                 type:'string',
                 alias: 'n',
-                describe: '指定网络'
-            })
+                describe: '指定网络,如果指定 local 则还需要指定选项 --id 或 -i 指定 Chainid',
+                default: 'mainnet',
+            }),
+            yargs.option('id',{
+                type:'number',
+                alias: 'i',
+                describe: '指定网络 chainid ,如果指定 local 必须指定此选项 ',
+                default: 1
+            }),
+            yargs.option('url',{
+                type:'string',
+                alias: 'u',
+                describe: '指定网络链接方式 示例 ws://127.0.0.1:9870  ,如果指定 local 必须指定此选项 ',
+                default:'ws://127.0.0.1:9870'
+            }),
+            yargs.choices('network', ['mainnet', 'barnard','development','local'])
+            yargs.choices('id', [1,251,254 ])
         },async (argv) =>{
-            await signmultisigtxn(argv)
+            try{
+                checkarg(argv)
+                await signmultisigtxn(argv)
+            }catch(e){
+                console.log(chalk.red(e))
+            }
             process.exit(0);
         }
     )
@@ -44,10 +79,30 @@ yargs(arg)
             yargs.option('network',{
                 type:'string',
                 alias: 'n',
-                describe: '指定网络'
-            })
+                describe: '指定网络,如果指定 local 则还需要指定选项 --id 或 -i 指定 Chainid',
+                default: 'mainnet',
+            }),
+            yargs.option('id',{
+                type:'number',
+                alias: 'i',
+                describe: '指定网络 chainid ,如果指定 local 必须指定此选项 ',
+                default: 1
+            }),
+            yargs.option('url',{
+                type:'string',
+                alias: 'u',
+                describe: '指定网络链接方式 示例 ws://127.0.0.1:9870  ,如果指定 local 必须指定此选项 ',
+                default:'ws://127.0.0.1:9870'
+            }),
+            yargs.choices('network', ['mainnet', 'barnard','development','local'])
+            yargs.choices('id', [1,251,254 ])
         },async (argv) =>{
-            await signmultisigfile(argv)
+            try{
+                checkarg(argv)
+                await signmultisigfile(argv)
+            }catch(e){
+                console.log(chalk.red(e))
+            }
             process.exit(0);
         }
     )
@@ -60,10 +115,30 @@ yargs(arg)
         yargs.option('network',{
             type:'string',
             alias: 'n',
-            describe: '指定网络'
-        })
+            describe: '指定网络,如果指定 local 则还需要指定选项 --id 或 -i 指定 Chainid',
+            default: 'mainnet',
+        }),
+        yargs.option('id',{
+            type:'number',
+            alias: 'i',
+            describe: '指定网络 chainid ,如果指定 local 必须指定此选项 ',
+            default: 1
+        }),
+        yargs.option('url',{
+            type:'string',
+            alias: 'u',
+            describe: '指定网络链接方式 示例 ws://127.0.0.1:9870  ,如果指定 local 必须指定此选项 ',
+            default:'ws://127.0.0.1:9870'
+        }),
+        yargs.choices('network', ['mainnet', 'barnard','development','local'])
+        yargs.choices('id', [1,251,254 ])
         },async  (argv) =>{
-            await deploy(argv)
+            try{
+                checkarg(argv)
+                await deploy(argv)
+            }catch(e){
+                console.log(chalk.red(e))
+            }
             process.exit(0);
         }
     )
@@ -80,6 +155,7 @@ yargs(arg)
         process.exit(0);
         }
     )
+    
     .version('version','Starcoin 多签工具','Starcoin 多签工具 v0.0.1')
     .epilogue('')
     .argv
