@@ -9,8 +9,8 @@ import {
 } from '@ethersproject/bytes';
 import dotenv from 'dotenv';
 import {Config} from './config.js';
-import * as ed25519Utils from '@noble/ed25519';
-import * as inquirer from 'inquirer';
+import {utils as ed25519Utils} from '@noble/ed25519';
+import inquirer from 'inquirer';
 import  { readFileSync,writeFileSync } from 'node:fs';
 import  exp from 'constants';
 
@@ -104,8 +104,8 @@ export function checkarg (argv){
             }
         }
         if( argv.network == 'local'){
-            if(! argv.id){
-                throw "参数错误:请输入 id 参数,指定本地网络的 chainid"
+            if(! argv.chainId){
+                throw "参数错误:请输入 chainId 参数,指定本地网络的 chainid"
             }
             if(! argv.url){
                 throw "参数错误:请输入 url 参数,指定本地网络的连接方式"
@@ -131,7 +131,7 @@ export  async function signmultisigtxn (argv){
     }
 
     let network = argv.network
-
+    let chainId = argv.chainId
     let provider ;
     let  config 
     if( argv.network == 'local'){
@@ -159,7 +159,7 @@ export  async function signmultisigtxn (argv){
         gasUnitPrice,
         senderSequenceNumber,
         expirationTimestampSecs,
-        config.chainId
+        chainId
     );
 
     const signatureShard = await utils.multiSign.generateMultiEd25519SignatureShard(shardAccount, rawUserTransaction)
@@ -263,6 +263,7 @@ export  async function deploy  (argv){
     
     let network = argv.network
     let file = argv.file
+    let chainId = argv.chainId
     let provider ;
     let  config 
     if( argv.network == 'local'){
@@ -292,7 +293,7 @@ export  async function deploy  (argv){
         gasUnitPrice,
         senderSequenceNumber,
         expirationTimestampSecs,
-        config.chainId
+        chainId
     );
    
     const signatureShard = await utils.multiSign.generateMultiEd25519SignatureShard(shardAccount, rawUserTransaction)

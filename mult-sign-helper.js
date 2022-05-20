@@ -43,10 +43,10 @@ yargs(arg)
             yargs.option('network',{
                 type:'string',
                 alias: 'n',
-                describe: '指定网络,如果指定 local 则还需要指定选项 --id 或 -i 指定 Chainid',
+                describe: '指定网络,如果指定 local 则还需要指定选项 --chainId 或 -i 指定 Chainid',
                 default: 'mainnet',
             }),
-            yargs.option('id',{
+            yargs.option('chainId',{
                 type:'number',
                 alias: 'i',
                 describe: '指定网络 chainid ,如果指定 local 必须指定此选项 ',
@@ -59,7 +59,7 @@ yargs(arg)
                 default:'ws://127.0.0.1:9870'
             }),
             yargs.choices('network', ['mainnet', 'barnard','development','local'])
-            yargs.choices('id', [1,251,254 ])
+            yargs.choices('chainId', [1,251,254 ])
         },async (argv) =>{
             try{
                 checkarg(argv)
@@ -79,10 +79,10 @@ yargs(arg)
             yargs.option('network',{
                 type:'string',
                 alias: 'n',
-                describe: '指定网络,如果指定 local 则还需要指定选项 --id 或 -i 指定 Chainid',
+                describe: '指定网络,如果指定 local 则还需要指定选项 --chainId 或 -i 指定 Chainid',
                 default: 'mainnet',
             }),
-            yargs.option('id',{
+            yargs.option('chainId',{
                 type:'number',
                 alias: 'i',
                 describe: '指定网络 chainid ,如果指定 local 必须指定此选项 ',
@@ -95,7 +95,7 @@ yargs(arg)
                 default:'ws://127.0.0.1:9870'
             }),
             yargs.choices('network', ['mainnet', 'barnard','development','local'])
-            yargs.choices('id', [1,251,254 ])
+            yargs.choices('chainId', [1,251,254 ])
         },async (argv) =>{
             try{
                 checkarg(argv)
@@ -115,10 +115,10 @@ yargs(arg)
         yargs.option('network',{
             type:'string',
             alias: 'n',
-            describe: '指定网络,如果指定 local 则还需要指定选项 --id 或 -i 指定 Chainid',
+            describe: '指定网络,如果指定 local 则还需要指定选项 --chainId 或 -i 指定 Chainid',
             default: 'mainnet',
         }),
-        yargs.option('id',{
+        yargs.option('chainId',{
             type:'number',
             alias: 'i',
             describe: '指定网络 chainid ,如果指定 local 必须指定此选项 ',
@@ -131,7 +131,7 @@ yargs(arg)
             default:'ws://127.0.0.1:9870'
         }),
         yargs.choices('network', ['mainnet', 'barnard','development','local'])
-        yargs.choices('id', [1,251,254 ])
+        yargs.choices('chainId', [1,251,254 ])
         },async  (argv) =>{
             try{
                 checkarg(argv)
