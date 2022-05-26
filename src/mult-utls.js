@@ -116,15 +116,23 @@ export function checkarg (argv){
     
 }
 export  async function signmultisigtxn (argv){
+    
     let functionId = argv.function
     let typeArgs
-    if(argv.type_tag.constructor != Array){
+
+    if(argv.type_tag == undefined){
+        typeArgs = []
+    }else if(argv.type_tag.constructor != Array ){
         typeArgs = [argv.type_tag]
     }else{
         typeArgs = argv.type_tag
     }
     let args
-    if(argv.arg.constructor != Array){
+
+    
+    if(argv.args == undefined){
+        args = []
+    }else if(argv.arg.constructor != Array ){
         args = [argv.arg]
     }else{
         args = argv.arg
@@ -134,6 +142,7 @@ export  async function signmultisigtxn (argv){
     let chainId = argv.chainId
     let provider ;
     let  config 
+
     if( argv.network == 'local'){
         provider = new providers.WebsocketProvider( argv.url );
         config = Config.networks['development'];
@@ -143,6 +152,7 @@ export  async function signmultisigtxn (argv){
     }
 
     const { shardAccount, sender } = await getMultiAccount();
+    
     let scriptFunction = await utils.tx.encodeScriptFunctionByResolve(functionId, typeArgs, args, config.url);
     const senderSequenceNumber = await provider.getSequenceNumber(
         sender
@@ -159,7 +169,7 @@ export  async function signmultisigtxn (argv){
         gasUnitPrice,
         senderSequenceNumber,
         expirationTimestampSecs,
-        chainId
+        config.chainId
     );
 
     const signatureShard = await utils.multiSign.generateMultiEd25519SignatureShard(shardAccount, rawUserTransaction)
